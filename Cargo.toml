@@ -14,6 +14,6 @@ repository = "https://github.com/jeffersoncbd/image-builder"
 homepage = "https://github.com/jeffersoncbd/image-builder"
 
 [dependencies]
-image = "0.24.5"
-imageproc = "0.23.0"
-rusttype = "0.9.3"
+image = "0.25.9"
+imageproc = "0.26.0"
+ab_glyph = "0.2.32"

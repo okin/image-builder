@@ -1,8 +1,7 @@
 use std::fs;
-use std::io::Cursor;
 
-use image::io::Reader as ImageReader;
-use image::DynamicImage;
+use image::ImageReader;
+use image::Rgba;
 use image_builder::{colors, FilterType, Image, Picture, Rect, Text};
 
 fn main() {
@@ -10,8 +9,9 @@ fn main() {
     let height = 280;
     let mut image = Image::new(width, height, colors::GRAY);
 
-    let roboto_bold = fs::read("fonts/Roboto/Roboto-Bold.ttf").expect("Failed to load \"fonts/Roboto/Roboto-Bold.ttf\"");
-    image.add_custom_font("Roboto bold", roboto_bold);
+    let roboto_bold = fs::read("fonts/Roboto/Roboto-Bold.ttf")
+        .expect("Failed to load \"fonts/Roboto/Roboto-Bold.ttf\"");
+    image.add_custom_font("Roboto bold", &roboto_bold);
 
     image.add_rect(
         Rect::new()
@@ -27,8 +27,8 @@ fn main() {
             .color(colors::GRAY),
     );
 
-    let logo = fs::read("logo.png").expect("Unable to read \"logo.png\"");
-    let img: DynamicImage = ImageReader::new(Cursor::new(logo))
+    let img = ImageReader::open("logo.png")
+        .expect("Unable to read \"logo.png\"")
         .with_guessed_format()
         .expect("jpg or png")
         .decode()
@@ -45,7 +45,7 @@ fn main() {
             .size(90)
             .font("Roboto bold")
             .position(60, 125)
-            .color([0, 0, 0, 100]),
+            .color(Rgba([0, 0, 0, 100])),
     );
 
     image.add_text(

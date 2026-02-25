@@ -1,5 +1,3 @@
-use image::Rgba;
-
 use crate::colors::{self, Color};
 
 /// Specifications of a rectangular shape.
@@ -60,10 +58,11 @@ impl Rect {
     ///     .color(colors::RED);
     /// ```
     /// ```
+    /// use image::Rgba;
     /// use image_builder::Rect;
     ///
     /// Rect::new()
-    ///     .color([150, 30, 255, 150]); // rgba values
+    ///     .color(Rgba([150, 30, 255, 150])); // rgba values
     /// ```
     pub fn color(&mut self, color: Color) -> Self {
         self.color = color;
@@ -77,7 +76,7 @@ pub struct RectValues {
     pub y: i32,
     pub width: u32,
     pub height: u32,
-    pub color: Rgba<u8>,
+    pub color: Color,
 }
 pub fn extract(rect: &Rect) -> RectValues {
     RectValues {
@@ -85,6 +84,6 @@ pub fn extract(rect: &Rect) -> RectValues {
         y: rect.position.1 as i32,
         width: rect.size.0,
         height: rect.size.1,
-        color: Rgba(rect.color),
+        color: rect.color,
     }
 }

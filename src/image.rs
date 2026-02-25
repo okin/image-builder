@@ -2,6 +2,7 @@ use std::{collections::HashMap, fs::File};
 
 pub use image::imageops::FilterType;
 
+use ab_glyph::FontRef;
 use image::{
     codecs::png::PngEncoder,
     imageops::{crop, overlay, resize},
@@ -11,7 +12,6 @@ use imageproc::{
     drawing::{draw_filled_rect_mut, draw_text_mut, text_size},
     rect as procRect,
 };
-use rusttype::Font;
 
 use crate::{
     colors::Color,
@@ -61,7 +61,7 @@ pub enum Element {
 pub struct Image<'a> {
     background: Color,
     size: (u32, u32),
-    fonts: HashMap<&'a str, Font<'a>>,
+    fonts: HashMap<&'a str, FontRef<'a>>,
     elements: Vec<Element>,
 }
 
@@ -75,8 +75,7 @@ impl<'a> Image<'a> {
     /// let mut image = Image::new(400, 300, colors::GRAY);
     /// ```
     pub fn new(width: u32, height: u32, background: Color) -> Image<'a> {
-        let default_font = Vec::from(include_bytes!("Roboto-Regular.ttf") as &[u8]);
-        let default_font = Font::try_from_vec(default_font)
+        let default_font = FontRef::try_from_slice(include_bytes!("Roboto-Regular.ttf"))
             .expect("Fail to load the default font \"Roboto-Regular.ttf\"");
 
         Image {
@@ -100,10 +99,11 @@ impl<'a> Image<'a> {
     ///
     /// let mut image = Image::new(500, 500, colors::WHITE);
     /// let roboto_bold = fs::read("src/Roboto-Regular.ttf").unwrap();
-    /// image.add_custom_font("Roboto Regular", roboto_bold);
+    /// image.add_custom_font("Roboto Regular", &roboto_bold);
     /// ```
-    pub fn add_custom_font(&mut self, name: &'a str, font: Vec<u8>) {
-        let font = Font::try_from_vec(font).expect(&format!("Fail to load the font \"{}\"", name));
+    pub fn add_custom_font(&mut self, name: &'a str, font: &'a Vec<u8>) {
+        let font = FontRef::try_from_slice(&font[..])
+            .expect(&format!("Fail to load the font \"{}\"", name));
         self.fonts.insert(name, font);
     }
 
@@ -121,7 +121,7 @@ impl<'a> Image<'a> {
 
     /// This method can be used before `add_text` to reqeust the expected width and height of a
     /// text element.
-    pub fn text_size(&mut self, text: &Text) -> (i32, i32) {
+    pub fn text_size(&mut self, text: &Text) -> (u32, u32) {
         let t = text::extract(&text);
         let font = self.fonts.get(t.font_name).expect(&format!("Unable to load the \"{}\" font, please verify that the name is correct or that it was loaded using the \"add_custom_font\" method.", t.font_name));
         text_size(t.scale, font, &t.content)
@@ -136,7 +136,7 @@ impl<'a> Image<'a> {
     /// renders the list of elements added in the order they were inserted by the user. Then, it creates the image file,
     /// adds the generated buffer, and encodes the content to save it to the disk.
     pub fn save(&mut self, file_name: &str) {
-        let mut image = ImageBuffer::from_pixel(self.size.0, self.size.1, Rgba(self.background));
+        let mut image = ImageBuffer::from_pixel(self.size.0, self.size.1, self.background);
 
         for element in self.elements.iter() {
             match element {
@@ -188,7 +188,7 @@ impl<'a> Image<'a> {
                 &image,
                 image.width(),
                 image.height(),
-                image::ColorType::Rgba8,
+                image::ColorType::Rgba8.into(),
             )
             .unwrap();
     }

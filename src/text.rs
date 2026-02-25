@@ -1,5 +1,4 @@
-use image::Rgba;
-use rusttype::Scale;
+use ab_glyph::PxScale as Scale;
 
 use crate::colors::{self, Color};
 
@@ -83,10 +82,11 @@ impl Text {
     ///     .color(colors::BLUE);
     /// ```
     /// ```
+    /// use image::Rgba;
     /// use image_builder::Text;
     ///
     /// Text::new("Any text here")
-    ///     .color([30, 90, 150, 255]); // rgba values
+    ///     .color(Rgba([30, 90, 150, 255])); // rgba values
     /// ```
     pub fn color(&mut self, color: Color) -> Self {
         self.color = color;
@@ -96,7 +96,7 @@ impl Text {
 
 #[derive(Clone)]
 pub struct TextValues<'a> {
-    pub color: Rgba<u8>,
+    pub color: Color,
     pub x: i32,
     pub y: i32,
     pub font_name: &'a str,
@@ -110,7 +110,7 @@ pub fn extract<'a>(text: &'a Text) -> TextValues<'a> {
         y: text.size as f32,
     };
     TextValues {
-        color: Rgba(text.color),
+        color: text.color,
         x: text.position.0 as i32,
         y: text.position.1 as i32,
         scale,
