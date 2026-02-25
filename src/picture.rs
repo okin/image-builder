@@ -121,7 +121,7 @@ pub struct PictureValues<'a> {
     pub crop: Option<CropValues>,
     pub resize: Option<ResizeValues>,
 }
-pub fn extract(picture: &Picture) -> PictureValues {
+pub fn extract(picture: &Picture) -> PictureValues<'_> {
     PictureValues {
         img: &picture.img,
         x: picture.position.0 as i64,
