@@ -10,7 +10,7 @@ fn main() {
     let height = 280;
     let mut image = Image::new(width, height, colors::GRAY);
 
-    let roboto_bold = fs::read("fonts/Roboto/Roboto-Bold.ttf").unwrap();
+    let roboto_bold = fs::read("fonts/Roboto/Roboto-Bold.ttf").expect("Failed to load \"fonts/Roboto/Roboto-Bold.ttf\"");
     image.add_custom_font("Roboto bold", roboto_bold);
 
     image.add_rect(
@@ -27,7 +27,7 @@ fn main() {
             .color(colors::GRAY),
     );
 
-    let logo = fs::read("logo.png").unwrap();
+    let logo = fs::read("logo.png").expect("Unable to read \"logo.png\"");
     let img: DynamicImage = ImageReader::new(Cursor::new(logo))
         .with_guessed_format()
         .expect("jpg or png")
